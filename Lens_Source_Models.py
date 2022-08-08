@@ -1,10 +1,10 @@
-## Fonction that define Lens model parameters
+## Function that defines Lens model parameters
 
 def lens_model__(theta_E,gamma,e1,e2):
   kwargs_epl = {'theta_E': theta_E, 'gamma': gamma, 'center_x': 0, 'center_y': 0, 'e1': e1, 'e2': e2} 
   return kwargs_epl
 
-## Fonction that define Source models parameters
+## Function that defines Source models parameters
 
 def source_model__(source_type,amp,e1,e2,center_x,center_y):
 
