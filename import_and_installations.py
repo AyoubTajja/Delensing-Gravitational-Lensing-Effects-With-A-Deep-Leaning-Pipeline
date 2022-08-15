@@ -19,6 +19,13 @@ import pandas as pd
 import os.path
 from PIL import Image
 import matplotlib.image
+import zipfile
+import sys
+import warnings
+from itertools import chain
+from skimage.io import imread, imshow, imread_collection, concatenate_images
+from skimage.transform import resize
+from skimage.morphology import label
 
 # rgb 2 gray 
 from skimage.color import rgb2gray
@@ -46,3 +53,11 @@ import lenstronomy.Util.simulation_util as sim_util
 # import the ShapeletSet class
 from lenstronomy.LightModel.Profiles.shapelets import ShapeletSet
 from lenstronomy.LightModel.Profiles.shapelets_polar import ShapeletSetPolar
+
+
+# Deep Learning packages
+from tensorflow.keras import datasets, layers, models
+from keras.preprocessing import image
+
+# Loss packages
+from skimage import measure
