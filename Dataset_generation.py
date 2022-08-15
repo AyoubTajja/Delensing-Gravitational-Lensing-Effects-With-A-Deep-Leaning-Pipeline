@@ -21,15 +21,15 @@ kwargs_numerics = {'supersampling_factor': 1, 'supersampling_convolution': False
 
 
 
-def generating_dataset(n,source,data_class,psf_class,kwargs_numerics,exp_time,background_rms,x, y):
+def generating_dataset(n,source_dataset,data_class,psf_class,kwargs_numerics,exp_time,background_rms,x, y):
   
   variable_dataset=False      
-  if not os.path.exists(source):
-      os.makedirs(source)
-      os.makedirs(source+'/Lensed_Dataset')
-      os.makedirs(source+'/Unlensed_Dataset')
-      os.makedirs(source+'/Noisy_Dataset')
-      os.makedirs(source+'/DataFrame_lens_parameters')
+  if not os.path.exists(source_dataset):
+      os.makedirs(source_dataset)
+      os.makedirs(source_dataset+'/Lensed_Dataset')
+      os.makedirs(source_dataset+'/Unlensed_Dataset')
+      os.makedirs(source_dataset+'/Noisy_Dataset')
+      os.makedirs(source_dataset+'/DataFrame_lens_parameters')
       
       variable_dataset=True
   
@@ -96,7 +96,7 @@ def generating_dataset(n,source,data_class,psf_class,kwargs_numerics,exp_time,ba
         image_model = imageModel.image(kwargs_lens, kwargs_source, kwargs_lens_light=None, kwargs_ps=None, source_add=True,lens_light_add=False,  point_source_add=False)
         image_model=image_model/np.max(image_model)
         # save in the wanted folder
-        matplotlib.image.imsave(source+'/Lensed_Dataset/'+str(i)+'.png',image_model,vmin=np.min(image_model),vmax=np.max(image_model))
+        matplotlib.image.imsave(source_dataset+'/Lensed_Dataset/'+str(i)+'.png',image_model,vmin=np.min(image_model),vmax=np.max(image_model))
         
         
         # noisy image
@@ -105,14 +105,14 @@ def generating_dataset(n,source,data_class,psf_class,kwargs_numerics,exp_time,ba
         image_real = image_model + poisson + bkg
         image_real=image_real/np.max(image_real)
         # save in the wanted folder
-        matplotlib.image.imsave(source+'/Noisy_Dataset/'+str(i)+'.png',image_real,cmap='viridis',vmin=np.min(image_real),vmax=np.max(image_real))
+        matplotlib.image.imsave(source_dataset+'/Noisy_Dataset/'+str(i)+'.png',image_real,cmap='viridis',vmin=np.min(image_real),vmax=np.max(image_real))
         
         # unlensed image
         imageModel_u = ImageModel(data_class, psf_class, kwargs_numerics=kwargs_numerics,source_model_class=source_model_class)#,lens_model_class=None)#, lens_light_model_class=None,point_source_class=None)
         unlensed_image = imageModel_u.image(kwargs_lens=None, kwargs_source=kwargs_source, kwargs_lens_light=None, kwargs_ps=None, source_add=True, lens_light_add=False,point_source_add=False)
         unlensed_image=unlensed_image/np.max(unlensed_image)
         # save in the wanted folder
-        matplotlib.image.imsave(source+'/UnLensed_Dataset/'+str(i)+'.png',unlensed_image,vmin=np.min(unlensed_image),vmax=np.max(unlensed_image))
+        matplotlib.image.imsave(source_dataset+'/UnLensed_Dataset/'+str(i)+'.png',unlensed_image,vmin=np.min(unlensed_image),vmax=np.max(unlensed_image))
         
         
         lens_parameters_dataset.append(np.array([theta_E,gamma,0,0,e1,e2]))
@@ -123,20 +123,18 @@ def generating_dataset(n,source,data_class,psf_class,kwargs_numerics,exp_time,ba
       
       dataFrame_lens_parameters = pd.DataFrame(lens_parameters_dataset)
       dataFrame_lens_parameters.columns = ['theta_E', 'gamma', 'center_x', 'center_y','e1', 'e2']
-      dataFrame_lens_parameters.to_csv(source+'/DataFrame_lens_parameters/Lens_DataFrame.csv')
+      dataFrame_lens_parameters.to_csv(source_dataset+'/DataFrame_lens_parameters/Lens_DataFrame.csv')
       
      
 
-source='C:/Users/Ayoub/Desktop/PFE/Generation_Dataset/Dataset'
+source_dataset='C:/Users/Ayoub/Desktop/PFE/Generation_Dataset/Dataset'
 
-## Make Grid
 numPix = 128  #  cutout pixel size
 deltaPix =0.05  #  pixel size in arcsec (area per pixel = deltaPix**2)
 
 x, y = util.make_grid(numPix, deltaPix)
-
-## Choose the number of data
 n=10000
 
-generating_dataset(n,source, data_class, psf_class, kwargs_numerics, exp_time, background_rms, x, y)#generating_dataset(n, data_class, psf_class, kwargs_numerics, exp_time, background_rms, x, y)#generating_dataset(n,data_class,psf_class,kwargs_numerics,exp_time,background_rms,x,y)
+generating_dataset(n,source_dataset, data_class, psf_class, kwargs_numerics, exp_time, background_rms, x, y)#generating_dataset(n, data_class, psf_class, kwargs_numerics, exp_time, background_rms, x, y)#generating_dataset(n,data_class,psf_class,kwargs_numerics,exp_time,background_rms,x,y)
+
 
