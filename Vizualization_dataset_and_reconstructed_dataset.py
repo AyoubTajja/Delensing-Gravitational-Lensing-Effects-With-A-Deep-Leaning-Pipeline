@@ -3,6 +3,17 @@ from Dataset_generation import dataset,labelset,n
 from Shapelet_Reconstruction import dataset_reconstructed,coeff_dataset
 from Vizualization_shapelets_basis import position,coord_to_pos
 
+
+## Open dataset
+source_dataset='C:/Users/Ayoub/Desktop/PFE/Generation_Dataset/Dataset'
+folder='Unlensed_Dataset/'
+unlensed_dataset=open_dataset(source+'/'+folder)
+folder='Lensed_Dataset/'
+lensed_dataset=open_dataset(source+'/'+folder)
+folder='Noisy_Dataset/'
+Noisy_Dataset_dataset=open_dataset(source+'/'+folder)
+
+
 ## For the Lens Model Plot we need the position of the sources, we have it in the labelset
 def coord_source_pos(labelset,n):
   L_sourcePos_x=[]
@@ -22,8 +33,7 @@ def coord_source_pos(labelset,n):
 
   return L_sourcePos_x,L_sourcePos_y
 
-
-def vizualize_dataset(L_affichage,nb_source,dataset,labelset,n,nb_affichage,numPix,deltaPix):
+def vizualize_dataset(L_affichage,nb_source,unlensed_dataset,lensed_dataset,noisy_dataset,labelset,n,nb_affichage,numPix,deltaPix):
   numPix,deltaPix=numPix,deltaPix
   lens_type='EPL'   
   lens_model_list = [lens_type]
@@ -31,15 +41,22 @@ def vizualize_dataset(L_affichage,nb_source,dataset,labelset,n,nb_affichage,numP
 
   L_sourcePos_x,L_sourcePos_y=coord_source_pos(labelset,n)
   # display the initial simulated image
-
+  '''
+  cmap_string = 'gray'
+  cmap = plt.get_cmap(cmap_string)
+  cmap.set_bad(color='k', alpha=1.)
+  cmap.set_under('k')
+  v_min = -4
+  v_max = 1
+  '''
   i=0
   nb_ligne=len(L_affichage)
-  f, axes = plt.subplots(nb_ligne, 4, figsize=(nb_ligne, 3*nb_ligne), sharex=False, sharey=False)
+  f, axes = plt.subplots(nb_ligne, 4, figsize=(int(0.8*nb_ligne), 3*nb_ligne), sharex=False, sharey=False)
   for ind in L_affichage:
     
     # sequence of weak lensing
     ax = axes[i][0]
-    im = ax.matshow(np.log10(dataset[ind][0]), origin='lower')
+    im = ax.matshow(np.log10(unlensed_dataset[ind]), origin='lower')#,vmin=v_min, vmax=v_max, cmap=cmap,   extent=[0, 1, 0, 1])
     ax.get_xaxis().set_visible(False)
     ax.get_yaxis().set_visible(False)
     ax.set_title('Unlensed Image')
@@ -49,7 +66,7 @@ def vizualize_dataset(L_affichage,nb_source,dataset,labelset,n,nb_affichage,numP
     f.colorbar(im, cax=cax, orientation='vertical')
       
     ax = axes[i][1]
-    im = ax.matshow(np.log10(dataset[ind][1]), origin='lower')
+    im = ax.matshow(np.log10(lensed_dataset[ind]), origin='lower')#,vmin=v_min, vmax=v_max, cmap=cmap,  extent=[0, 1, 0, 1])
     ax.get_xaxis().set_visible(False)
     ax.get_yaxis().set_visible(False)
     ax.set_title('Lensed Image')
@@ -60,7 +77,7 @@ def vizualize_dataset(L_affichage,nb_source,dataset,labelset,n,nb_affichage,numP
     
 
     ax = axes[i][2]
-    im = ax.matshow(np.log10(dataset[ind][2]), origin='lower')
+    im = ax.matshow(np.log10(noisy_dataset[ind]), origin='lower')#,vmin=v_min, vmax=v_max, cmap=cmap,  extent=[0, 1, 0, 1])
     ax.get_xaxis().set_visible(False)
     ax.get_yaxis().set_visible(False)
     ax.set_title('Noisy image')
@@ -87,39 +104,47 @@ def vizualize_dataset(L_affichage,nb_source,dataset,labelset,n,nb_affichage,numP
 def vizualize_dataset_shapelet(L_affichage,dataset_reconstructed,n,nb_affichage,nb_source):
   
   # display the initial simulated image
+  '''
+  cmap_string = 'gray'
+  cmap = plt.get_cmap(cmap_string)
+  cmap.set_bad(color='k', alpha=1.)
+  cmap.set_under('k')
+  v_min = -4
+  v_max = 1
+  '''
   nb_ligne=len(L_affichage)
   i=0
-  f, axes = plt.subplots(nb_ligne, 3, figsize=(nb_ligne, 3*nb_ligne), sharex=False, sharey=False)
+  f, axes = plt.subplots(nb_ligne, 3, figsize=(int(0.5*nb_ligne), 3*nb_ligne), sharex=False, sharey=False)
   for ind in L_affichage:
     # sequence of weak lensing
     ax = axes[i][0]
-    im = ax.matshow(np.log10(dataset_reconstructed[ind][0]), origin='lower')
+    im = ax.matshow(np.log10(dataset_reconstructed[ind][0]), origin='lower')#, vmin=v_min, vmax=v_max, cmap=cmap,  extent=[0, 1, 0, 1]) #vmin=v_min, vmax=v_max, cmap=cmap,
     ax.get_xaxis().set_visible(False)
     ax.get_yaxis().set_visible(False)
     divider = make_axes_locatable(ax)
     cax = divider.append_axes('right', size='5%', pad=0.05)
     f.colorbar(im, cax=cax, orientation='vertical')
-    ax.set_title('Unlensed Image')
+    #ax.set_title('Source Image')
     ax.autoscale(False)
     
     ax = axes[i][1]
-    im = ax.matshow(np.log10(dataset_reconstructed[ind][1]), origin='lower')
+    im = ax.matshow(np.log10(dataset_reconstructed[ind][1]), origin='lower')#, vmin=v_min, vmax=v_max, cmap=cmap, extent=[0, 1, 0, 1]) #vmin=v_min, vmax=v_max, cmap=cmap,
     ax.get_xaxis().set_visible(False)
     ax.get_yaxis().set_visible(False)
     divider = make_axes_locatable(ax)
     cax = divider.append_axes('right', size='5%', pad=0.05)
     f.colorbar(im, cax=cax, orientation='vertical')
-    ax.set_title('Lensed Image')
+    #ax.set_title(labelset_ind_s[ind][j-1][0])
     ax.autoscale(False)
 
     ax = axes[i][2]
-    im = ax.matshow(np.log10(dataset_reconstructed[ind][2]), origin='lower')
+    im = ax.matshow(np.log10(dataset_reconstructed[ind][2]), origin='lower')#, vmin=v_min, vmax=v_max, cmap=cmap, extent=[0, 1, 0, 1]) #vmin=v_min, vmax=v_max, cmap=cmap,
     ax.get_xaxis().set_visible(False)
     ax.get_yaxis().set_visible(False)
     divider = make_axes_locatable(ax)
     cax = divider.append_axes('right', size='5%', pad=0.05)
     f.colorbar(im, cax=cax, orientation='vertical')
-    ax.set_title('Noisy Lensed Image')
+    #ax.set_title(labelset_ind_s[ind][j][0])
     ax.autoscale(False)
     
     i=i+1
@@ -129,34 +154,39 @@ def vizualize_dataset_shapelet(L_affichage,dataset_reconstructed,n,nb_affichage,
 
 def vizualize_dataset_coeff_shapelet(len_coeff_shapelet,L_affichage,coeff_dataset,n,nb_affichage,nb_source):
   # display the initial simulated image
+  '''
+  cmap_string = 'gray'
+  cmap = plt.get_cmap(cmap_string)
+  cmap.set_bad(color='k', alpha=1.)
+  cmap.set_under('k')
+  v_min = -4
+  v_max = 1
+  '''
   x_ax_shapelett=np.linspace(0,len_coeff_shapelet-1,num=len_coeff_shapelet,dtype='int')
 
   nb_ligne=len(L_affichage)
   i=0
-  f, axes = plt.subplots(nb_ligne, 3, figsize=(nb_ligne, 3*nb_ligne), sharex=False, sharey=False)
+  f, axes = plt.subplots(nb_ligne, 3, figsize=(int(0.5*nb_ligne), 3*nb_ligne), sharex=False, sharey=False)
   for ind in L_affichage:
     # sequence of weak lensing
     ax = axes[i][0]
     ax.plot(x_ax_shapelett,coeff_dataset[ind][0])
     ax.get_xaxis().set_visible(True)
     ax.get_yaxis().set_visible(True)
-    ax.set_title('Unlensed Image')
     
     ax = axes[i][1]
     ax.plot(x_ax_shapelett,coeff_dataset[ind][1])
     ax.get_xaxis().set_visible(True)
     ax.get_yaxis().set_visible(True)
-    ax.set_title('Lensed Image')
-    
+
     ax = axes[i][2]
     ax.plot(x_ax_shapelett,coeff_dataset[ind][2])
     ax.get_xaxis().set_visible(True)
     ax.get_yaxis().set_visible(True)
-    ax.set_title('Noisy Lensed Image')
+    
     i=i+1
 
   plt.show()
-  
   
 #########################################################################################################################################################################
 #########################################################################################################################################################################
@@ -180,7 +210,7 @@ labelset_=labelset
 
 vizualize_dataset(L_affichage,nb_source,dataset,labelset,n,nb_affichage,numPix,deltaPix)
 
-
+'''
 ## Plot Reconstructed Images with Shapelets
 dataset_reconstructed_=dataset_reconstructed
 
