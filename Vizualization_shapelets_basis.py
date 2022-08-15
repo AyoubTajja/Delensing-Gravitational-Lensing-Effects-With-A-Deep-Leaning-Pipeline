@@ -1,27 +1,6 @@
 from import_and_installations import *
+from Shapelet_Reconstruction import beta,nmax,theta_min,theta_max
 
-
-numPix=128
-nmax=170
-
-theta_max=numPix
-theta_min=theta_max/(nmax+1)
-
-beta=np.sqrt(theta_max*theta_min)
-
-deltaPix=theta_min
-
-## choice of the nmax to plot some basis shapelets 
-n_max_plot=8
-
-## Choice of the type of shapelets : ShapeletSet() is cartesian and ShapeletSetPolar() is polar
-shapeletSet=ShapeletSet()
-
-# vector that contains the shapelet basis
-shapelet_basis=shapeletSet.shapelet_basis_2d(n_max_plot, beta, numPix, deltaPix=deltaPix, center_x=0, center_y=0)
-print('len(shapelet_basis) = '+str(len(shapelet_basis)))
-
-n_shap=len(shapelet_basis)
 
 ## Function that from the N position in the shapelet vector decomposition gives the n1,n2 integers of the shapelet
 def position(N):
@@ -59,6 +38,22 @@ def nb_ligne_col(n_shap):
     return nb_ligne,nb_colonne
   else :
     return n_shap,0
+
+
+numPix=theta_max
+deltaPix=theta_min
+
+## choice of the nmax to plot some basis shapelets 
+n_max_plot=8
+
+## Choice of the type of shapelets : ShapeletSet() is cartesian and ShapeletSetPolar() is polar
+shapeletSet=ShapeletSet()
+
+# vector that contains the shapelet basis
+shapelet_basis=shapeletSet.shapelet_basis_2d(n_max_plot, beta, numPix, deltaPix=deltaPix, center_x=0, center_y=0)
+print('len(shapelet_basis) = '+str(len(shapelet_basis)))
+
+n_shap=len(shapelet_basis)
 
 
 nb_ligne, nb_colonne=nb_ligne_col(n_shap)
