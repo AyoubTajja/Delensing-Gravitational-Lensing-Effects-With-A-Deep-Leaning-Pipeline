@@ -1,5 +1,5 @@
 from import_and_installations import *
-from Dataset_generation import generating_dataset,x,y,numPix,deltaPix,data_class, psf_class, kwargs_numerics, exp_time, background_rms
+from Dataset_generation import generating_dataset,x,y,numPix,deltaPix,data_class, psf_class, kwargs_numerics, exp_time, background_rms,source_dataset,n
 
 
 def shapelet_reconstruction(n,source_dataset,source_reconstruction,choice_type_shapelet,beta,nmax,x,y,deltaPix):
@@ -115,9 +115,7 @@ def shapelet_reconstruction(n,source_dataset,source_reconstruction,choice_type_s
       dataFrame_noisy_coeff_dataset.to_csv(source_reconstruction+'/DataFrame_noisy_coeff_dataset/Noisy_coeff_dataset_DataFrame.csv')
       
       
-    
-source_dataset='C:/Users/Ayoub/Desktop/PFE/Generation_Dataset/Dataset'
-
+      
 if not os.path.exists(source_dataset):
     generating_dataset(n,source_dataset, data_class, psf_class, kwargs_numerics, exp_time, background_rms, x, y)#generating_dataset(n, data_class, psf_class, kwargs_numerics, exp_time, background_rms, x, y)#generating_dataset(n,data_class,psf_class,kwargs_numerics,exp_time,background_rms,x,y)
 
@@ -128,11 +126,11 @@ choice_type_shapelet=ShapeletSet()
 
 
 
-theta_min=0.75
+theta_min=1
 theta_max=128
 
 beta=np.sqrt(theta_max*theta_min)
-nmax=int(theta_max/theta_min-1)
+nmax=np.min((170,int(theta_max/theta_min-1)))
 
 print('\nbeta = '+str(beta))
 print('nmax = '+str(nmax))
