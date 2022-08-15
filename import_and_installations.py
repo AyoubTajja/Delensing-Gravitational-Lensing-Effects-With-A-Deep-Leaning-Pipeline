@@ -15,6 +15,13 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from tqdm import tqdm
 import copy
 from random import *
+import pandas as pd
+import os.path
+from PIL import Image
+import matplotlib.image
+
+# rgb 2 gray 
+from skimage.color import rgb2gray
 
 #import the lens_plot module
 from lenstronomy.Plots import lens_plot
