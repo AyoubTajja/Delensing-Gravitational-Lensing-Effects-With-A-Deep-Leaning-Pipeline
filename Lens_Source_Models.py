@@ -1,10 +1,10 @@
-## Function that defines Lens model parameters
+## Function that define Lens model parameters
 
 def lens_model__(theta_E,gamma,e1,e2):
   kwargs_epl = {'theta_E': theta_E, 'gamma': gamma, 'center_x': 0, 'center_y': 0, 'e1': e1, 'e2': e2} 
   return kwargs_epl
 
-## Function that defines Source models parameters
+## Function that define Source models parameters
 
 def source_model__(source_type,amp,e1,e2,center_x,center_y):
 
@@ -17,7 +17,7 @@ def source_model__(source_type,amp,e1,e2,center_x,center_y):
     return kwargs_Hernquist
   
   if source_type=='POWER_LAW':
-    kwargs_power_law={'amp': amp, 'gamma':0.1, 'e1':e1,'e2':e2, 'center_x': center_x, 'center_y': center_y}
+    kwargs_power_law={'amp': 0.5*amp, 'gamma':0.01, 'e1':0.1*e1,'e2':0.1*e2, 'center_x': center_x, 'center_y': center_y}
     return kwargs_power_law
 
   if source_type=='ELLIPSOID':
