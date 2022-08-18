@@ -21,15 +21,12 @@ kwargs_numerics = {'supersampling_factor': 1, 'supersampling_convolution': False
 
 
 
-def generating_dataset(n,source_dataset,data_class,psf_class,kwargs_numerics,exp_time,background_rms,x, y):
+def generating_dataset(n,folder_path_dataset,data_class,psf_class,kwargs_numerics,exp_time,background_rms,x, y):
   
   variable_dataset=False      
-  if not os.path.exists(source_dataset):
-      os.makedirs(source_dataset)
-      os.makedirs(source_dataset+'/Lensed_Dataset')
-      os.makedirs(source_dataset+'/Unlensed_Dataset')
-      os.makedirs(source_dataset+'/Noisy_Dataset')
-      os.makedirs(source_dataset+'/DataFrame_lens_parameters')
+  if not os.path.exists(folder_path_dataset):
+      os.makedirs(folder_path_dataset)
+      
       
       variable_dataset=True
   
@@ -39,8 +36,13 @@ def generating_dataset(n,source_dataset,data_class,psf_class,kwargs_numerics,exp
       kwargs_lens_light_list = []
       
       ## Initialization of dataset
-      lens_parameters_dataset=[]
+      unlensed_dataset=[]
+      lensed_dataset=[]
+      noisy_dataset=[]
       
+      lens_parameters_dataset=[]
+      source_type_dataset=[]
+      source_parameters_dataset=[]
       ## Type of sources used in the dataset
       source_type_list=['SERSIC_ELLIPSE','HERNQUIST','NIE','CHAMELEON']#,'POWER_LAW']#,'GAUSSIAN_ELLIPSE']#MULTI_GAUSSIAN_ELLIPSE'],'UNIFORM','ELLIPSOID']#,'POWER_LAW',,'UNIFORM','GAUSSIAN_ELLIPSE',,'ELLIPSOID',
       
@@ -49,6 +51,9 @@ def generating_dataset(n,source_dataset,data_class,psf_class,kwargs_numerics,exp
       
       ## number of sources
       nb_source=len(source_type_list)
+      
+      ##
+      Maxim_global=0
       
       for i in tqdm(range(n)):
         source_model_list=[]
@@ -89,52 +94,71 @@ def generating_dataset(n,source_dataset,data_class,psf_class,kwargs_numerics,exp
     
         kwargs_label_lens=[lens_model_list,kwargs_lens]
         
+        
         ### Generation DATA
         
         # image without noise
         imageModel = ImageModel(data_class, psf_class, lens_model_class=lens_model_class, source_model_class=source_model_class, kwargs_numerics=kwargs_numerics)#, lens_light_model_class=None,point_source_class=None)
         image_model = imageModel.image(kwargs_lens, kwargs_source, kwargs_lens_light=None, kwargs_ps=None, source_add=True,lens_light_add=False,  point_source_add=False)
-        image_model=image_model/np.max(image_model)
-        # save in the wanted folder
-        matplotlib.image.imsave(source_dataset+'/Lensed_Dataset/'+str(i)+'.png',image_model,vmin=np.min(image_model),vmax=np.max(image_model))
         
+        lensed_dataset.append(np.array(image_model))
         
         # noisy image
         poisson = image_util.add_poisson(image_model, exp_time=exp_time)
         bkg = image_util.add_background(image_model, sigma_bkd=background_rms)
         image_real = image_model + poisson + bkg
-        image_real=image_real/np.max(image_real)
-        # save in the wanted folder
-        matplotlib.image.imsave(source_dataset+'/Noisy_Dataset/'+str(i)+'.png',image_real,cmap='viridis',vmin=np.min(image_real),vmax=np.max(image_real))
+        
+        noisy_dataset.append(np.array(image_real))
         
         # unlensed image
         imageModel_u = ImageModel(data_class, psf_class, kwargs_numerics=kwargs_numerics,source_model_class=source_model_class)#,lens_model_class=None)#, lens_light_model_class=None,point_source_class=None)
         unlensed_image = imageModel_u.image(kwargs_lens=None, kwargs_source=kwargs_source, kwargs_lens_light=None, kwargs_ps=None, source_add=True, lens_light_add=False,point_source_add=False)
-        unlensed_image=unlensed_image/np.max(unlensed_image)
-        # save in the wanted folder
-        matplotlib.image.imsave(source_dataset+'/UnLensed_Dataset/'+str(i)+'.png',unlensed_image,vmin=np.min(unlensed_image),vmax=np.max(unlensed_image))
         
+        unlensed_dataset.append(np.array(unlensed_image))
         
+        # Maximum update
+        maxim_local=np.max((unlensed_image,image_model))
+        Maxim_global=np.max((maxim_local,Maxim_global))
+
+
         lens_parameters_dataset.append(np.array([theta_E,gamma,0,0,e1,e2]))
-    
-     
+        source_type_dataset.append(source_model_list)
+        source_parameters_dataset.append(kwargs_source)
+      
+      
+      unlensed_dataset=np.array(unlensed_dataset)
+      lensed_dataset=np.array(lensed_dataset)
+      noisy_dataset=np.array(noisy_dataset)
+      
+      
       lens_parameters_dataset=np.array(lens_parameters_dataset)
+      source_type_dataset=np.array(source_type_dataset)
+      source_parameters_dataset=np.array(source_parameters_dataset)
+      
+      ## Same scale to have Relative brightness between images for the training
+      noisy_dataset=noisy_dataset/Maxim_global
+      lensed_dataset=lensed_dataset/Maxim_global
+      unlensed_dataset=unlensed_dataset/Maxim_global
+      
+      ## Save
+      np.save(folder_path_dataset+'/unlensed_dataset'+'.npy', unlensed_dataset)
+      np.save(folder_path_dataset+'/lensed_dataset'+'.npy', lensed_dataset)
+      np.save(folder_path_dataset+'/noisy_dataset'+'.npy', noisy_dataset)
       
       
-      dataFrame_lens_parameters = pd.DataFrame(lens_parameters_dataset)
-      dataFrame_lens_parameters.columns = ['theta_E', 'gamma', 'center_x', 'center_y','e1', 'e2']
-      dataFrame_lens_parameters.to_csv(source_dataset+'/DataFrame_lens_parameters/Lens_DataFrame.csv')
+      np.save(folder_path_dataset+'/lens_parameters.npy',lens_parameters_dataset)
+      np.save(folder_path_dataset+'/source_types.npy',source_type_dataset)
+      np.save(folder_path_dataset+'/source_parameters.npy',source_parameters_dataset)
       
      
 
-source_dataset='C:/Users/Ayoub/Desktop/PFE/Generation_Dataset/Dataset'
+folder_path_dataset='C:/Users/Ayoub/Desktop/PFE/Generation_Dataset/Dataset'
 
 numPix = 128  #  cutout pixel size
 deltaPix =0.05  #  pixel size in arcsec (area per pixel = deltaPix**2)
 
 x, y = util.make_grid(numPix, deltaPix)
-n=10000
+n=10
 
-generating_dataset(n,source_dataset, data_class, psf_class, kwargs_numerics, exp_time, background_rms, x, y)#generating_dataset(n, data_class, psf_class, kwargs_numerics, exp_time, background_rms, x, y)#generating_dataset(n,data_class,psf_class,kwargs_numerics,exp_time,background_rms,x,y)
-
+generating_dataset(n,folder_path_dataset, data_class, psf_class, kwargs_numerics, exp_time, background_rms, x, y)#generating_dataset(n, data_class, psf_class, kwargs_numerics, exp_time, background_rms, x, y)#generating_dataset(n,data_class,psf_class,kwargs_numerics,exp_time,background_rms,x,y)
 
