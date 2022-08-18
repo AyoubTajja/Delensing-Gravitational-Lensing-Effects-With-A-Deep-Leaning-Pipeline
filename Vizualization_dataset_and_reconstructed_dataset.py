@@ -3,7 +3,6 @@ from Dataset_generation import generating_dataset,x,y,numPix,deltaPix,data_class
 from Shapelet_Reconstruction import folder_path_reconstruction,shapelet_reconstruction,choice_type_shapelet,beta,nmax,delta
 from Vizualization_shapelets_basis import position,coord_to_pos
 
-
       
 if not os.path.exists(folder_path_dataset):
     generating_dataset(n,folder_path_dataset, data_class, psf_class, kwargs_numerics, exp_time, background_rms, x, y)
