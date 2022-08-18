@@ -1,5 +1,6 @@
 from import_and_installations import *
-from Shapelet_Reconstruction import beta,nmax,theta_min,theta_max
+from Shapelet_Reconstruction import beta,theta_min,theta_max
+from Dataset_generation import numPix,deltaPix
 
 
 ## Function that from the N position in the shapelet vector decomposition gives the n1,n2 integers of the shapelet
@@ -42,6 +43,7 @@ def nb_ligne_col(n_shap):
 
 numPix=theta_max
 deltaPix=theta_min
+
 
 ## choice of the nmax to plot some basis shapelets 
 n_max_plot=8
